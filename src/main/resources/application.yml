@@ -1,0 +1,36 @@
+spring:
+  kafka:
+    # 集群地址，多态地址使用逗号分隔
+    bootstrap-servers: localhost:9092
+    # 生产者配置
+    producer:
+      # 重试次数，大于0的值，则生产者会将发送失败的记录重新发送
+      retries: 3
+      # 重试间隔，避免某些失败场景下以紧密循环的方式重复发送请求
+      retry-backoff-ms: 100
+      # 消息会缓存到本地内存，批量发送到broker的打下，默认值16k
+      batch-size: 16384
+      # 生产者最大可用缓存，默认32M
+      # 生产者可以用来缓冲等待发送到服务器的记录的总内存字节，如果记录被发送的速度超过了它们可以被发送到服务器的速度，
+      buffer-memory: 33554432
+      # 发送应答：生产者在考虑完成请求之前要求 leader 收到的确认的数量，这控制了发送的记录的持久性
+      # acks = 0 设置为0，则生产者将不会等待来自服务器的任何确认，该记录将立即添加到缓存区并视为已发送；在这种
+      # acks = 1 设置为1，意味着leader 将等待完整的同步副本集以确认记录，保证了只要至少一个同步副本服务器仍然存活
+      acks: 1
+      # 指定消息 key 和消息体的编码方式
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    # 消费者
+    consumer:
+      # 消费者组
+      group-id: test
+      # 是否自动提交
+      enable-auto-commit: true
+      # 消费者偏移配置
+      # none: 如果没有为消费者找到先前的 offset 的值，即没有自动维护偏移量，也没有手动维护偏移量，则抛出异常
+      # earliest: 在各分区下提交的 offset 时，从 offset 处开始消费；在各分区下无提交 offset 时，从头开始消费
+      # latest: 在各分区下提交的 offset 时，从 offset 处开始消费；在各分区下无提交 offset 时，从最新的数据开始消费
+      auto-offset-reset: latest
+      # 指定消息key和消息体的解码方式
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
